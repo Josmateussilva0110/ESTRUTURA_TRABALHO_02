@@ -31,19 +31,21 @@ int eh_nulo_esq(Artista **raiz)
     return ((*raiz)->esq == NULL);
 }
 
-
 void rotacao_esquerda(Artista **raiz) 
 {
+    printf("Rotacao Esquerda: %s\n", (*raiz)->nome);
     Artista *aux = (*raiz)->dir;
     (*raiz)->dir = aux->esq;
     aux->esq = (*raiz);
     aux->cor = (*raiz)->cor;
     (*raiz)->cor = 1;
     (*raiz) = aux;
+    printf("Nova cor de %s: %s\n", (*raiz)->nome, (*raiz)->cor == 0 ? "preta" : "vermelha");
 }
 
 void rotacao_direita(Artista **raiz) 
 {
+    printf("Rotacao Direita: %s\n", (*raiz)->nome);
     Artista *aux = (*raiz)->esq;
     (*raiz)->esq = aux->dir;
     aux->dir = (*raiz);
@@ -54,6 +56,7 @@ void rotacao_direita(Artista **raiz)
 
 void trocar_cor(Artista **raiz)
 {
+    printf("Trocar Cor: %s\n", (*raiz)->nome);
     (*raiz)->cor = 1;
     (*raiz)->esq->cor = 0;
     (*raiz)->dir->cor = 0;
@@ -61,12 +64,19 @@ void trocar_cor(Artista **raiz)
 
 void balancear(Artista **raiz)
 {
-    if(!eh_nulo_dir(raiz) && (*raiz)->dir->cor == 1)
-        rotacao_esquerda(raiz);
-    if(!eh_nulo_esq(raiz) && (*raiz)->esq->cor == 1 && (*raiz)->esq->esq != NULL && (*raiz)->esq->esq->cor == 1)
-        rotacao_direita(raiz);
-    if(!eh_nulo_esq(raiz) && (*raiz)->esq->cor == 1 && !eh_nulo_dir(raiz) && (*raiz)->dir->cor == 1)
-        trocar_cor(raiz);
+    printf("Balancear: %s\n", (*raiz)->nome);
+
+    if (!(*raiz)->pai) {
+        // Se o nó atual for a raiz, define sua cor como preta
+        (*raiz)->cor = 0;  // 0 para preto
+    } else {
+        if (!eh_nulo_dir(raiz) && (*raiz)->dir->cor == 1)
+            rotacao_esquerda(raiz);
+        if (!eh_nulo_esq(raiz) && (*raiz)->esq->cor == 1 && (*raiz)->esq->esq != NULL && (*raiz)->esq->esq->cor == 1)
+            rotacao_direita(raiz);
+        if (!eh_nulo_esq(raiz) && (*raiz)->esq->cor == 1 && !eh_nulo_dir(raiz) && (*raiz)->dir->cor == 1)
+            trocar_cor(raiz);
+    }
 }
 
 // Função para criar um novo nó de artista
