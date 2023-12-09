@@ -42,7 +42,7 @@ int main()
                 printf("Numero de albuns: ");
                 scanf("%d", &numero_album);
                 limparBuffer();
-                inserir(&arvore, nome, estilo, numero_album);
+                inserir_artista(&arvore, nome, estilo, numero_album);
                 break;
             case 2:
                 exibir_arvore(&arvore);

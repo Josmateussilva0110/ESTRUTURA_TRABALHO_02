@@ -12,6 +12,7 @@ typedef struct Artista
     Album *albuns;
     struct Artista *esq, *dir;  // Ponteiros para a árvore vermelha-preta
     int cor;  // 0 para preto, 1 para vermelho
+    struct Artista *pai;
 } Artista;
 
 
@@ -69,66 +70,37 @@ void balancear(Artista **raiz)
 }
 
 // Função para criar um novo nó de artista
-Artista *criar_artista(Artista **raiz, char *nome_artista, char *estilo_musical, int numero_albuns, int *valid) 
+Artista *criar_artista(char *nome_artista, char *estilo_musical, int numero_albuns) 
 {
-    Artista *retorno;
-    retorno = NULL;
+    Artista *novo_artista = (Artista *)malloc(sizeof(Artista));
+    strcpy(novo_artista->nome, nome_artista);
+    strcpy(novo_artista->estilo_musical, estilo_musical);
+    novo_artista->num_albuns = numero_albuns;
+    novo_artista->albuns = NULL;
+    novo_artista->esq = NULL;
+    novo_artista->dir = NULL;
+    novo_artista->pai = NULL;
+    novo_artista->cor = 1;
+    return novo_artista;
+}
 
-    if(eh_nulo_raiz(raiz))
-    {
-        Artista *novo_artista = (Artista *)malloc(sizeof(Artista));
-        if(novo_artista != NULL)
-        {
-            strcpy(novo_artista->nome, nome_artista);
-            strcpy(novo_artista->estilo_musical, estilo_musical);
-            novo_artista->num_albuns = numero_albuns;
-            novo_artista->albuns = NULL;
-            novo_artista->esq = NULL;
-            novo_artista->dir = NULL;
-            novo_artista->cor = 1;
-            *valid = 1;
-            retorno = novo_artista;
-        }
-        else
-        {
-            *valid = 0;
-        }
-    } 
-    else
-    {
-        int comparacao = strcmp(nome_artista, (*raiz)->nome);
-        if(comparacao == 0)
-        {
-            *valid = 0;
-            retorno = *raiz;
-        }
-        else if(comparacao < 0)
-        {
-            (*raiz)->esq = criar_artista(&(*raiz)->esq, nome_artista, estilo_musical, numero_albuns, valid);
-        }
-        else
-        {
-            (*raiz)->dir = criar_artista(&(*raiz)->dir, nome_artista, estilo_musical, numero_albuns, valid); 
-        }
 
-        balancear(raiz);
-        retorno = *raiz;
+void inserir_artista(Artista **raiz, char *nome, char *estilo, int num_albuns) 
+{
+    if (*raiz == NULL) 
+        *raiz = criar_artista(nome, estilo, num_albuns);  
+    else 
+    {
+        if (strcmp(nome, (*raiz)->nome) < 0)
+            inserir_artista(&((*raiz)->esq), nome, estilo, num_albuns);
+        else if (strcmp(nome, (*raiz)->nome) > 0)
+            inserir_artista(&((*raiz)->dir), nome, estilo, num_albuns);
+        balancear(raiz); 
     }
-
-    return retorno;
 }
 
 
-Artista *inserir(Artista **raiz, char *nome_artista, char *estilo_musical, int numero_albuns)
-{
-    int valid = 0;
-    *raiz = criar_artista(raiz, nome_artista, estilo_musical, numero_albuns, &valid);
-    if(*raiz != NULL)
-        (*raiz)->cor = 0;
-    return *raiz;
-}
-
-
+// exibe em ordem 
 void exibir_arvore(Artista **raiz)
 {
     if (!eh_nulo_raiz(raiz))
@@ -141,6 +113,7 @@ void exibir_arvore(Artista **raiz)
         exibir_arvore(&(*raiz)->dir);
     }
 }
+
 
 // Função para encontrar um artista na árvore com base no nome
 Artista *achar_artista(Artista *raiz, const char *nome_artista) {
