@@ -25,14 +25,3 @@ Album *criarAlbum(char titulo[], int ano_lancamento, int num_musicas) {
     novo_album->cor = 1;  // Novo nó é vermelho por padrão
     return novo_album;
 }
-
-
-// Função para inserir um nó na árvore vermelha-preta
-Album *inserirAlbum(Album *raiz, Album *novo_album) 
-{
-    // Implementação da inserção em árvore vermelha-preta
-    // ...
-
-    // Retornar a nova raiz após a inserção
-    return raiz;
-}
