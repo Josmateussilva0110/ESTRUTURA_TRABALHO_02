@@ -8,6 +8,7 @@ typedef struct Album {
     char titulo[100];
     int ano_lancamento;
     int num_musicas;
+    Musica *musicas;
     struct Album *esq, *dir;  // Ponteiros para a árvore vermelha-preta
     int cor;
 } Album;
@@ -67,13 +68,15 @@ void balancear_album(Album **raiz)
 }
 
 // Função para criar um novo nó de álbum
-Album *criar_album(char *titulo, int ano_lancamento, int num_musicas) {
+Album *criar_album(char *titulo, int ano_lancamento, int num_musicas)
+{
     Album *novo_album = (Album *)malloc(sizeof(Album));
     if (novo_album != NULL) {
         strcpy(novo_album->titulo, titulo);
         novo_album->ano_lancamento = ano_lancamento;
         novo_album->num_musicas = num_musicas;
         novo_album->esq = novo_album->dir = NULL;
+        novo_album->musicas = NULL;
         novo_album->cor = 1;  // Supondo que 1 representa a cor vermelha na árvore
     }
     return novo_album;
@@ -104,6 +107,52 @@ Album *inserir_album(Album **raiz, char *titulo, int ano_lancamento, int num_mus
     return resultado;
 }
 
+Album *achar_album(Album *raiz, const char *nome_do_album) {
+    printf("Entrou aqui achar_album\n");
+    Album *encontrado;
+    encontrado = NULL;
 
+    if (raiz != NULL) {
+        int comparacao = strcmp(nome_do_album, raiz->titulo);
+
+        if (comparacao == 0) {
+            encontrado = raiz;
+        } else if (comparacao < 0) {
+            encontrado = achar_album(raiz->esq, nome_do_album);
+        } else {
+            encontrado = achar_album(raiz->dir, nome_do_album);
+        }
+    }
+    return encontrado;
+}
+
+// Função para cadastrar músicas em um álbum
+void cadastrar_musicas(Album *raiz_albuns, char *nome_do_album, char *nome_musica, int duracao_minutos) {
+    printf("Entrou aqui cadastrar_musicas\n");
+    Album *album_encontrado = achar_album(raiz_albuns, nome_do_album);
+
+    if (album_encontrado) {
+        album_encontrado->musicas = inserirMusica(album_encontrado->musicas, nome_musica, duracao_minutos);
+    } else {
+        printf("Álbum %s não encontrado.\n", nome_do_album);
+    }
+}
+
+// Função para exibir as informações de um álbum e suas músicas
+void exibir_album_e_musicas(Album *raiz) {
+    if (raiz != NULL) {
+        // Exibir informações do álbum
+        printf("Album: %s\n", raiz->titulo);
+        printf("Ano de Lancamento: %d\n", raiz->ano_lancamento);
+        printf("Numero de Musicas: %d\n", raiz->num_musicas);
+
+        // Exibir músicas do álbum
+        exibir_musicas(raiz->musicas);
+
+        // Recursivamente exibir álbuns e músicas
+        exibir_album_e_musicas(raiz->esq);
+        exibir_album_e_musicas(raiz->dir);
+    }
+}
 
 
