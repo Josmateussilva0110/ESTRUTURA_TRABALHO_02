@@ -6,12 +6,17 @@
 
 void menu()
 {
-    printf("\nDigite a opcao desejada:\n0 - Sair\n1 - Cadastrar Artista\n2 - Exibir Artista\n3 - Cadastrar Albuns\n4 - Cadastrar Musicas\n5 - Buscas\n>>> ");
+    printf("\nDigite a opcao desejada:\n0 - Sair\n1 - Cadastrar Artista\n2 - Exibir Artista\n3 - Cadastrar Albuns\n4 - Cadastrar Musicas\n5 - Buscas\n6 - Excluir\n>>> ");
 }
 
 void menu_busca()
 {
     printf("\nEscolha o tipo de busca:\n1 - Buscar Artista\n2 - Buscar Album\n3 - Buscar Musica\n0 - Voltar\n>>> ");
+}
+
+void menu_remocao()
+{
+    printf("\nEscolha o tipo de remocao:\n1 - Remover Artista\n2 - Remover Album\n3 - Remover Musica\n0 - Voltar\n>>> ");
 }
 
 void limparBuffer() 
@@ -132,6 +137,37 @@ int main()
                             printf("Opcao invalida. Tente novamente.\n");
                     }
                     break;
+            case 6: 
+                menu_remocao();
+                int op_remocao;
+                scanf("%d", &op_remocao);
+                limparBuffer();
+
+                switch (op_remocao)
+                {
+                    case 1:
+                        // printf("Nome do artista para remover: ");
+                        // fgets(nome_artista1, sizeof(nome_artista1), stdin);
+                        // nome_artista1[strcspn(nome_artista1, "\n")] = '\0';
+                        // remover_artista(arvore, nome_artista1);
+                        break;
+                    case 2:
+                        // printf("Nome do album para remover: ");
+                        // fgets(nome_album, sizeof(nome_album), stdin);
+                        // nome_album[strcspn(nome_album, "\n")] = '\0';
+                        // remover_album(arvore->albuns, nome_album);
+                        break;
+                    case 3:
+                        // printf("Nome da musica para remover: ");
+                        // fgets(nome_musica1, sizeof(nome_musica1), stdin);
+                        // nome_musica1[strcspn(nome_musica1, "\n")] = '\0';
+                        // remover_musica(arvore, )
+                        break;
+                    case 0:
+                        break;
+                    default:
+                        printf("Opcao invalida. Tente novamente.\n");
+                }
                 break;
             default:
                 printf("Opcao invalida. Tente novamente.\n");

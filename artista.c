@@ -315,3 +315,21 @@ void buscar_albums_e_artistas_pela_musica(Artista *raiz_artistas, const char *no
     }
 }
 
+// Função para liberar a memória de todos os álbuns de uma árvore de artistas
+void liberar_artistas(Artista *raiz) {
+    if (raiz != NULL) {
+        // Liberar álbuns do artista
+        liberar_albuns(raiz->albuns);
+
+        // Liberar artistas da subárvore esquerda
+        liberar_artistas(raiz->esq);
+
+        // Liberar artistas da subárvore direita
+        liberar_artistas(raiz->dir);
+
+        // Liberar o próprio artista
+        free(raiz);
+    }
+}
+
+

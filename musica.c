@@ -75,3 +75,11 @@ Musica *achar_musica(Musica *raiz, const char *titulo) {
     // A música não foi encontrada
     return NULL;
 }
+
+void liberar_musicas(Musica *lista) {
+    while (lista != NULL) {
+        Musica *atual = lista;
+        lista = lista->prox;
+        free(atual);
+    }
+}

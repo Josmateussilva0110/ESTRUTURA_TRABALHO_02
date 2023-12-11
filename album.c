@@ -155,4 +155,18 @@ void exibir_album_e_musicas(Album *raiz) {
     }
 }
 
+void liberar_albuns(Album *raiz) {
+    if (raiz != NULL) {
+        // Liberar músicas do álbum
+        liberar_musicas(raiz->musicas);
 
+        // Liberar álbuns da subárvore esquerda
+        liberar_albuns(raiz->esq);
+
+        // Liberar álbuns da subárvore direita
+        liberar_albuns(raiz->dir);
+
+        // Liberar o próprio álbum
+        free(raiz);
+    }
+}
