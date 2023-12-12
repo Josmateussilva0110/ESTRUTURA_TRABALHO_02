@@ -1,24 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "funcoes.c"
+#include "artista.c"
+
+
+void menu()
+{
+    printf("\nDigite a opcao desejada:\n0 - Sair\n1 - Cadastrar Artista\n2 - Exibir Artista\n3 - Cadastrar Albuns\n4 - Cadastrar Musicas\n5 - Buscas\n6 - Excluir\n>>> ");
+}
+
+void limparBuffer() 
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 int main()
 {
-    Arv_2_3 *arvore = NULL;
-    int op;
+    Artista *arvore = NULL;
+    int op, numero_album;
+    char nome[70], estilo[70];
     do
     {
-        int sobe, valor, flag;
-        printf("0- sair\n1- inserir\n2 - exibir\n>>> ");
+        int flag;
+        Info sobe;
+        menu();
         scanf("%d",&op);
+        limparBuffer(); 
         switch (op)
         {
             case 0:
                 break;
             case 1:
-                printf("valor: ");
-                scanf("%d",&valor);
-                inserir(&arvore, valor, NULL, &sobe, &flag);
+                printf("Nome do artista: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                printf("Estilo musical: ");
+                fgets(estilo, sizeof(estilo), stdin);
+                estilo[strcspn(estilo, "\n")] = '\0';
+                printf("Numero de albuns: ");
+                scanf("%d", &numero_album);
+                limparBuffer();
+                inserir(&arvore, nome, estilo, numero_album, NULL, &sobe, &flag);
                 if(flag == 1)
                     printf("insercao completa.\n");
                 else
@@ -26,6 +48,7 @@ int main()
                 break;
             case 2:
                 imprimir(arvore);
+                break;
             default:
                 break;
         }
