@@ -2,7 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "album.c"
+#include "album_2_3.c"
+
+
+typedef struct ListaAlbum
+{
+    Album *arvore_album;
+    struct ListaAlbum *prox;
+}ListaAlbum;
+
 
 
 typedef struct Info
@@ -10,15 +18,16 @@ typedef struct Info
     char nome[50];
     char estilo_musical[50];
     int num_albuns;
+    ListaAlbum *lista_albuns;  // Lista de árvores de álbuns
 }Info;
 
 typedef struct Artista 
 {
     Info *info_1, *info_2;
     int num_info;
-    Album *albuns;
     struct Artista *esq, *dir, *centro; 
-} Artista;
+}Artista;
+
 
 
 
@@ -29,6 +38,9 @@ Artista *criaNo(char *nome, char *estilo, int num_albuns, Artista *noEsq, Artist
     strcpy(no->info_1->nome, nome);
     strcpy(no->info_1->estilo_musical, estilo);
     no->info_1->num_albuns = num_albuns;
+
+    no->info_1->lista_albuns = (ListaAlbum*)malloc(sizeof(ListaAlbum));
+    no->info_1->lista_albuns->arvore_album = NULL;
     no->num_info = 1;
     no->esq = noEsq;
     no->centro = noCentro;
@@ -36,9 +48,12 @@ Artista *criaNo(char *nome, char *estilo, int num_albuns, Artista *noEsq, Artist
     return no;
 }
 
+
 void adicionaNo(Artista **raiz, char *nome, char *estilo, int num_albuns, Artista *filho) 
 {
     (*raiz)->info_2 = (Info*)malloc(sizeof(Info));
+    (*raiz)->info_2->lista_albuns = (ListaAlbum*)malloc(sizeof(ListaAlbum));
+    (*raiz)->info_2->lista_albuns->arvore_album = NULL;
     if(strcmp(nome, (*raiz)->info_1->nome) > 0)
     {
         strcpy((*raiz)->info_2->nome, nome);
@@ -51,10 +66,12 @@ void adicionaNo(Artista **raiz, char *nome, char *estilo, int num_albuns, Artist
         strcpy((*raiz)->info_2->nome, (*raiz)->info_1->nome);
         strcpy((*raiz)->info_2->estilo_musical, (*raiz)->info_1->estilo_musical);
         (*raiz)->info_2->num_albuns = (*raiz)->info_1->num_albuns;
+        (*raiz)->info_2->lista_albuns->arvore_album = (*raiz)->info_1->lista_albuns->arvore_album;
 
         strcpy((*raiz)->info_1->nome, nome);
         strcpy((*raiz)->info_1->estilo_musical, estilo);
         (*raiz)->info_1->num_albuns = num_albuns;
+        (*raiz)->info_1->lista_albuns->arvore_album = NULL;
 
         (*raiz)->dir = (*raiz)->centro;
         (*raiz)->centro = filho;
@@ -193,3 +210,61 @@ void imprimir(Artista *raiz)
     }
 }
 
+Artista *achar_artista(Artista *raiz, const char *nome, int *posicao)
+{
+    Artista *encontrada = NULL;
+
+    if(raiz != NULL)
+    {
+        if(strcmp(nome, raiz->info_1->nome) == 0)
+        {
+            encontrada = raiz;
+            *posicao = 1;
+        }
+
+        if(raiz->num_info == 2)
+        {
+            if(strcmp(nome, raiz->info_1->nome) == 0)
+            {
+                encontrada = raiz;
+                *posicao = 1;
+            }
+            else if(strcmp(nome, raiz->info_2->nome) == 0)
+            {
+                encontrada = raiz;
+                *posicao = 2;   
+            }
+        }
+
+        if(encontrada == NULL)
+        {
+            if(strcmp(nome, raiz->info_1->nome) < 0)
+                encontrada = achar_artista(raiz->esq, nome, posicao);
+            else if((raiz->num_info == 1 || (raiz->num_info == 2 && strcmp(nome, raiz->info_2->nome) < 0)))
+                encontrada = achar_artista(raiz->centro, nome, posicao);
+            else
+                encontrada = achar_artista(raiz->dir, nome, posicao);
+        }
+    }
+    return encontrada;
+}
+
+
+void cadastrar_albuns(Artista *albuns, char *titulo, int ano_lancamento, int num_musicas, int posicao)
+{
+    printf("posicao cadastrar album: %d\n",posicao);
+    Info_album sobe;
+    if(posicao == 1)
+        inserir_album(&(albuns)->info_1->lista_albuns->arvore_album, titulo, ano_lancamento, num_musicas, NULL, &sobe);
+    else if(posicao == 2)
+        inserir_album(&(albuns)->info_2->lista_albuns->arvore_album, titulo, ano_lancamento, num_musicas, NULL, &sobe);
+}
+
+void mostrar_album(Artista *raiz, int posicao)
+{
+    printf("entrou aqui!!!\n");
+    if(posicao == 1)
+        imprimir_album(raiz->info_1->lista_albuns->arvore_album);
+    else if(posicao == 2)
+        imprimir_album(raiz->info_2->lista_albuns->arvore_album);
+}
