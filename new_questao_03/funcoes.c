@@ -45,6 +45,7 @@ void criaNo(Memoria **no, Bloco info, Memoria *esq, Memoria *centro_esq, Memoria
 	(*no)->centro_dir = centro_dir;
 	(*no)->dir = dir;
 }
+
 void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
 {
     if((*no)->n_info == 1)
@@ -52,7 +53,7 @@ void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
         if (info.I_bloco > (*no)->info_1.F_bloco)
         { 
             (*no)->info_2 = info;
-            (*no)->dir = filho;
+            (*no)->centro = filho;
         }
         else
         {
@@ -69,7 +70,7 @@ void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
         if(info.I_bloco > (*no)->info_2.F_bloco)
         {
             (*no)->info_3 = info;
-            (*no)->dir = filho;
+            (*no)->centro_dir = filho;
         }
         else if(info.I_bloco > (*no)->info_1.F_bloco && info.F_bloco < (*no)->info_2.I_bloco)
         {
@@ -79,17 +80,17 @@ void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
             (*no)->centro_dir = (*no)->centro;
             (*no)->centro = filho;
         } else{
-		(*no)->info_3 = (*no)->info_2;
-		(*no)->info_2 = (*no)->info_1;
-		(*no)->info_1 = info;
+			(*no)->info_3 = (*no)->info_2;
+			(*no)->info_2 = (*no)->info_1;
+			(*no)->info_1 = info;
 
-		(*no)->centro_dir = (*no)->centro;
-		(*no)->centro = (*no)->centro_esq;
-		(*no)->centro_esq = filho;
-	}
+			(*no)->centro_dir = (*no)->centro;
+			(*no)->centro = (*no)->centro_esq;
+			(*no)->centro_esq = filho;
+		}
         (*no)->n_info = 3;
     }
-    else if((*no)->n_info == 3)
+    else 
     {
         if(info.I_bloco > (*no)->info_3.F_bloco)
         {
@@ -104,24 +105,24 @@ void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
             (*no)->dir = (*no)->centro_dir;
             (*no)->centro_dir = filho;
         } else if(info.I_bloco > (*no)->info_1.F_bloco && info.F_bloco < (*no)->info_2.I_bloco){
-		(*no)->info_4 = (*no)->info_3;
-		(*no)->info_3 = (*no)->info_2;
-		(*no)->info_1 = info;
+			(*no)->info_4 = (*no)->info_3;
+			(*no)->info_3 = (*no)->info_2;
+			(*no)->info_1 = info;
 
-		(*no)->dir = (*no)->centro_dir;
-		(*no)->centro_dir = (*no)->centro;
-		(*no)->centro = filho;
-	} else{
-		(*no)->info_4 = (*no)->info_3;
-		(*no)->info_3 = (*no)->info_2;
-		(*no)->info_2 = (*no)->info_1;
-		(*no)->info_1 = info;
+			(*no)->dir = (*no)->centro_dir;
+			(*no)->centro_dir = (*no)->centro;
+			(*no)->centro = filho;
+		} else{
+			(*no)->info_4 = (*no)->info_3;
+			(*no)->info_3 = (*no)->info_2;
+			(*no)->info_2 = (*no)->info_1;
+			(*no)->info_1 = info;
 
-		(*no)->dir = (*no)->centro_dir;
-		(*no)->centro_dir = (*no)->centro;
-		(*no)->centro = (*no)->centro_esq;
-		(*no)->centro_esq = filho;
-	}
+			(*no)->dir = (*no)->centro_dir;
+			(*no)->centro_dir = (*no)->centro;
+			(*no)->centro = (*no)->centro_esq;
+			(*no)->centro_esq = filho;
+		}
         (*no)->n_info = 4;
     }
 }
@@ -329,4 +330,3 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 
 	}
 }
-
