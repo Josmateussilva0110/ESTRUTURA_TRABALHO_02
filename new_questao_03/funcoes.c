@@ -124,21 +124,28 @@ void quebraNo(Memoria **No, Bloco info, Bloco *sobe, Memoria **No_maior, Memoria
     else if (info.I_bloco < (*No)->info_2.I_bloco)
     {
         *sobe = info;
-        criaNo(No_maior, (*No)->info_2, filho, (*No)->centro_dir, (*No)->dir, NULL, NULL);
+        criaNo(No_maior, (*No)->info_2, filho, (*No)->dir, NULL, NULL, NULL);
     }
     else if (info.I_bloco < (*No)->info_3.I_bloco)
     {
         *sobe = (*No)->info_2;
-        criaNo(No_maior, info, filho, (*No)->centro_dir, (*No)->dir, NULL, NULL);
+        criaNo(No_maior, info, filho, (*No)->dir, NULL, NULL, NULL);
     }
-    else
+    else if (info.I_bloco < (*No)->info_4.I_bloco)
     {
         *sobe = (*No)->info_3;
         criaNo(No_maior, (*No)->info_4, filho, NULL, NULL, NULL, NULL);
     }
+    else
+    {
+        *sobe = (*No)->info_4;
+        criaNo(No_maior, info, NULL, NULL, NULL, NULL, NULL);
+    }
 
+    (*No)->centro_dir = (*No)->dir = NULL;
     (*No)->n_info = 2;
 }
+
 
 
 
@@ -225,42 +232,27 @@ void imprimir(Memoria *Raiz)
 {
     if (Raiz != NULL)
     {
+
         imprimir(Raiz->esq);
-        imprime_bloco_info(Raiz->info_1);
-
-        if (Raiz->n_info >= 2)
-        {
-            imprime_bloco_info(Raiz->info_2);
-        }
-
-        if (Raiz->n_info >= 3)
-        {
-            imprime_bloco_info(Raiz->info_3);
-        }
-
-        if (Raiz->n_info == 4)
-        {
-            imprime_bloco_info(Raiz->info_4);
-        }
-
+		imprime_bloco_info(Raiz->info_1);
         imprimir(Raiz->centro_esq);
+		if(Raiz->n_info == 2)
+			imprime_bloco_info(Raiz->info_2);
+
+       // imprimir(Raiz->centro);
 
         if (Raiz->n_info == 3)
-        {
-            imprime_bloco_info(Raiz->info_2);
-        }
-
-        imprimir(Raiz->centro);
-
-        if (Raiz->n_info == 4)
-        {
             imprime_bloco_info(Raiz->info_3);
-        }
 
         imprimir(Raiz->centro_dir);
+
+        if (Raiz->n_info == 4)
+            imprime_bloco_info(Raiz->info_4);
+
         imprimir(Raiz->dir);
     }
 }
+
 
 
 
