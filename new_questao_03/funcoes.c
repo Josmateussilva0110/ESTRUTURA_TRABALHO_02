@@ -45,12 +45,11 @@ void criaNo(Memoria **no, Bloco info, Memoria *esq, Memoria *centro_esq, Memoria
 	(*no)->centro_dir = centro_dir;
 	(*no)->dir = dir;
 }
-
 void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
 {
     if((*no)->n_info == 1)
     {
-        if (info.I_bloco > (*no)->info_1.I_bloco )
+        if (info.I_bloco > (*no)->info_1.F_bloco)
         { 
             (*no)->info_2 = info;
             (*no)->dir = filho;
@@ -59,48 +58,70 @@ void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
         {
             (*no)->info_2 = (*no)->info_1;
             (*no)->info_1 = info;
-            (*no)->dir = (*no)->centro_dir;
-            (*no)->centro_dir = (*no)->centro;
+            
             (*no)->centro = (*no)->centro_esq;
             (*no)->centro_esq = filho;
         }
-
         (*no)->n_info = 2;
     }
     else if((*no)->n_info == 2)
     {
-        if(info.I_bloco > (*no)->info_2.I_bloco)
+        if(info.I_bloco > (*no)->info_2.F_bloco)
         {
             (*no)->info_3 = info;
             (*no)->dir = filho;
         }
-        else
+        else if(info.I_bloco > (*no)->info_1.F_bloco && info.F_bloco < (*no)->info_2.I_bloco)
         {
             (*no)->info_3 = (*no)->info_2; 
             (*no)->info_2 = info;
-            (*no)->dir = (*no)->centro_dir;
+			
             (*no)->centro_dir = (*no)->centro;
-            (*no)->centro = (*no)->centro_esq;
-            (*no)->centro_esq = filho;
-        }
+            (*no)->centro = filho;
+        } else{
+		(*no)->info_3 = (*no)->info_2;
+		(*no)->info_2 = (*no)->info_1;
+		(*no)->info_1 = info;
+
+		(*no)->centro_dir = (*no)->centro;
+		(*no)->centro = (*no)->centro_esq;
+		(*no)->centro_esq = filho;
+	}
         (*no)->n_info = 3;
     }
     else if((*no)->n_info == 3)
     {
-        if(info.I_bloco > (*no)->info_3.I_bloco)
+        if(info.I_bloco > (*no)->info_3.F_bloco)
         {
             (*no)->info_4 = info;
             (*no)->dir = filho;
         }
-        else
+        else if(info.I_bloco > (*no)->info_2.F_bloco && info.F_bloco < (*no)->info_3.I_bloco)
         {
             (*no)->info_4 = (*no)->info_3; 
             (*no)->info_3 = info;
+
             (*no)->dir = (*no)->centro_dir;
-            (*no)->centro_dir = (*no)->centro;
-            (*no)->centro = (*no)->centro_esq;
-            (*no)->centro_esq = filho;
-        }
+            (*no)->centro_dir = filho;
+        } else if(info.I_bloco > (*no)->info_1.F_bloco && info.F_bloco < (*no)->info_2.I_bloco){
+		(*no)->info_4 = (*no)->info_3;
+		(*no)->info_3 = (*no)->info_2;
+		(*no)->info_1 = info;
+
+		(*no)->dir = (*no)->centro_dir;
+		(*no)->centro_dir = (*no)->centro;
+		(*no)->centro = filho;
+	} else{
+		(*no)->info_4 = (*no)->info_3;
+		(*no)->info_3 = (*no)->info_2;
+		(*no)->info_2 = (*no)->info_1;
+		(*no)->info_1 = info;
+
+		(*no)->dir = (*no)->centro_dir;
+		(*no)->centro_dir = (*no)->centro;
+		(*no)->centro = (*no)->centro_esq;
+		(*no)->centro_esq = filho;
+	}
         (*no)->n_info = 4;
     }
 }
