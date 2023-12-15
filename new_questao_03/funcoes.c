@@ -9,13 +9,13 @@ typedef struct Bloco
 {
 	int I_bloco,F_bloco; 
 	char estado;         
-}bloco;
+}Bloco;
 
 
 typedef struct Memoria
 {
-	bloco info_1, info_2, info_3, info_4;
-	struct Memoria *esq,*cen,*dir;
+	Bloco info_1, info_2, info_3, info_4;
+	struct Memoria *esq, *centro_esq, *centro, *centro_dir, *dir;
 	int n_info;
 
 }Memoria;
@@ -27,25 +27,26 @@ int folha(Memoria *no)
 	int flag = 0;
 	if (no != NULL)
     {
-		if (no->esq == NULL && no->cen == NULL && no->dir == NULL)
+		if (no->esq == NULL && no->centro_esq == NULL && no->centro == NULL && no->centro_dir == NULL && no->dir == NULL)
 			flag = 1;
 	}
 	return flag;
 }
 
-void criaNo(Memoria **no, bloco info, Memoria *esq, Memoria *cen, Memoria *dir)
+void criaNo(Memoria **no, Bloco info, Memoria *esq, Memoria *centro_esq, Memoria *centro, Memoria *centro_dir, Memoria *dir)
 {
-
 	*no = (Memoria *)malloc(sizeof(Memoria));
 
 	(*no)->info_1 = info;
 	(*no)->n_info = 1;
 	(*no)->esq = esq;
-	(*no)->cen = cen;
+	(*no)->centro_esq = centro_esq;
+	(*no)->centro = centro;
+	(*no)->centro_dir = centro_dir;
 	(*no)->dir = dir;
 }
 
-void adicionaNo(Memoria **no, bloco info, Memoria *filho)
+void adicionaNo(Memoria **no, Bloco info, Memoria *filho)
 {
     if((*no)->n_info == 1)
     {
@@ -56,11 +57,12 @@ void adicionaNo(Memoria **no, bloco info, Memoria *filho)
         }
         else
         {
-
             (*no)->info_2 = (*no)->info_1;
             (*no)->info_1 = info;
-            (*no)->dir = (*no)->cen;
-            (*no)->cen = filho;
+            (*no)->dir = (*no)->centro_dir;
+            (*no)->centro_dir = (*no)->centro;
+            (*no)->centro = (*no)->centro_esq;
+            (*no)->centro_esq = filho;
         }
 
         (*no)->n_info = 2;
@@ -76,8 +78,10 @@ void adicionaNo(Memoria **no, bloco info, Memoria *filho)
         {
             (*no)->info_3 = (*no)->info_2; 
             (*no)->info_2 = info;
-            (*no)->dir = (*no)->cen;
-            (*no)->cen = filho;
+            (*no)->dir = (*no)->centro_dir;
+            (*no)->centro_dir = (*no)->centro;
+            (*no)->centro = (*no)->centro_esq;
+            (*no)->centro_esq = filho;
         }
         (*no)->n_info = 3;
     }
@@ -92,12 +96,15 @@ void adicionaNo(Memoria **no, bloco info, Memoria *filho)
         {
             (*no)->info_4 = (*no)->info_3; 
             (*no)->info_3 = info;
-            (*no)->dir = (*no)->cen;
-            (*no)->cen = filho;
+            (*no)->dir = (*no)->centro_dir;
+            (*no)->centro_dir = (*no)->centro;
+            (*no)->centro = (*no)->centro_esq;
+            (*no)->centro_esq = filho;
         }
         (*no)->n_info = 4;
     }
 }
+
 
 void limpa_buffer(){ 
 	int ch;
@@ -105,43 +112,44 @@ void limpa_buffer(){
 
 }
 
-void quebraNo(Memoria **No, bloco info, bloco *sobe, Memoria **No_maior,  Memoria *filho)
+void quebraNo(Memoria **No, Bloco info, Bloco *sobe, Memoria **No_maior, Memoria *filho)
 {
-    if (info.I_bloco < (*No)->info_1.I_bloco )
-    { 
+    if (info.I_bloco < (*No)->info_1.I_bloco)
+    {
         *sobe = (*No)->info_1;
-        criaNo(No_maior, (*No)->info_2, (*No)->cen, (*No)->dir, NULL);
+        criaNo(No_maior, (*No)->info_2, (*No)->centro, (*No)->centro_dir, (*No)->dir, NULL, NULL);
         (*No)->info_1 = info;
-        (*No)->cen = filho;
+        (*No)->centro = filho;
     }
-    else if (info.I_bloco < (*No)->info_2.I_bloco )
-    { 
+    else if (info.I_bloco < (*No)->info_2.I_bloco)
+    {
         *sobe = info;
-        criaNo(No_maior, (*No)->info_2, filho, (*No)->dir, NULL);
+        criaNo(No_maior, (*No)->info_2, filho, (*No)->centro_dir, (*No)->dir, NULL, NULL);
     }
-    else if (info.I_bloco < (*No)->info_3.I_bloco )
-    { 
+    else if (info.I_bloco < (*No)->info_3.I_bloco)
+    {
         *sobe = (*No)->info_2;
-        criaNo(No_maior, info, filho, (*No)->dir, NULL);
+        criaNo(No_maior, info, filho, (*No)->centro_dir, (*No)->dir, NULL, NULL);
     }
     else
     {
         *sobe = (*No)->info_3;
-        criaNo(No_maior, (*No)->info_4, filho, NULL, NULL);
+        criaNo(No_maior, (*No)->info_4, filho, NULL, NULL, NULL, NULL);
     }
 
-    (*No)->dir = NULL;
-    (*No)->n_info = 1;
+    (*No)->n_info = 2;
 }
 
-Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
+
+
+Memoria *insere(Memoria **Pai,Memoria **Raiz ,Bloco info, Bloco *sobe)
 { 
 
 	Memoria *No_maior;
 	No_maior = NULL;
 
 	if (*Raiz == NULL){
-		criaNo(Raiz,info,NULL,NULL, NULL);
+		criaNo(Raiz,info,NULL,NULL, NULL, NULL, NULL);
 
 	}else{
 
@@ -156,7 +164,7 @@ Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
 
 				if (*Pai == NULL){
 					Memoria *aux;
-					criaNo(&aux,*sobe,*Raiz,No_maior, NULL);
+					criaNo(&aux,*sobe,*Raiz,No_maior, NULL, NULL, NULL);
 
 					*Raiz = aux;
 
@@ -173,7 +181,7 @@ Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
 			    No_maior= insere(Raiz,&(*Raiz)->dir,info,sobe);
 		   	
 		   	}else{
-			    No_maior= insere(Raiz,&(*Raiz)->cen,info,sobe);
+			    No_maior= insere(Raiz,&(*Raiz)->centro,info,sobe);
 		    }
 
 			if (No_maior != NULL){
@@ -184,7 +192,7 @@ Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
 					
 				}else{
 
-					bloco sobe2;
+					Bloco sobe2;
 					Memoria *No_maior2;
 
 					quebraNo(Raiz,*sobe,&sobe2,&No_maior2,No_maior);
@@ -192,7 +200,7 @@ Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
 					if (*Pai == NULL){
 						Memoria *aux;
 
-						criaNo(&aux,sobe2,*Raiz,No_maior2, NULL);
+						criaNo(&aux,sobe2,*Raiz,No_maior2, NULL, NULL, NULL);
 						*Raiz = aux;
 						No_maior = NULL;
 					
@@ -208,39 +216,64 @@ Memoria *insere(Memoria **Pai,Memoria **Raiz ,bloco info, bloco *sobe)
 	return No_maior;
 }
 
-void imprime_bloco_info(bloco b)
+void imprime_bloco_info(Bloco b)
 {
-	printf("bloco: %d , %d - %c\n",b.I_bloco,b.F_bloco,b.estado);
+	printf("Bloco: %d , %d - %c\n",b.I_bloco,b.F_bloco,b.estado);
 }
 
 void imprimir(Memoria *Raiz)
 {
-	if(Raiz != NULL)
+    if (Raiz != NULL)
     {
-		imprimir(Raiz->esq);
-		imprime_bloco_info(Raiz->info_1);
-		imprimir(Raiz->cen);
-        
-		if(Raiz->n_info == 2)
-			imprime_bloco_info(Raiz->info_2);
-        if(Raiz->n_info == 3)
+        imprimir(Raiz->esq);
+        imprime_bloco_info(Raiz->info_1);
+
+        if (Raiz->n_info >= 2)
+        {
+            imprime_bloco_info(Raiz->info_2);
+        }
+
+        if (Raiz->n_info >= 3)
+        {
             imprime_bloco_info(Raiz->info_3);
-        if(Raiz->n_info == 4)
+        }
+
+        if (Raiz->n_info == 4)
+        {
             imprime_bloco_info(Raiz->info_4);
-		imprimir(Raiz->dir);
-	}
+        }
+
+        imprimir(Raiz->centro_esq);
+
+        if (Raiz->n_info == 3)
+        {
+            imprime_bloco_info(Raiz->info_2);
+        }
+
+        imprimir(Raiz->centro);
+
+        if (Raiz->n_info == 4)
+        {
+            imprime_bloco_info(Raiz->info_3);
+        }
+
+        imprimir(Raiz->centro_dir);
+        imprimir(Raiz->dir);
+    }
 }
+
+
 
 void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 {
 
-	bloco info,sobe;
+	Bloco info,sobe;
 	Memoria *Pai;
 
 	info.I_bloco = info.F_bloco = 0;
 
 	limpa_buffer();
-	printf("digite o estado do primeiro bloco da memoria(l = livre ||  o = ocupado): ");
+	printf("digite o estado do primeiro Bloco da memoria(l = livre ||  o = ocupado): ");
 	scanf("%c",&info.estado);
 	limpa_buffer();
 
@@ -248,7 +281,7 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 
 	while(info.estado != 'o' && info.estado != 'l' ){
 		printf("\ndigite um estado valido || (l = livre ||  o = ocupado)!!\n");
-		printf("digite o estado do primeiro bloco da memoria(l = livre ||  o = ocupado): ");
+		printf("digite o estado do primeiro Bloco da memoria(l = livre ||  o = ocupado): ");
 		scanf("%c",&info.estado);
 		info.estado = tolower(info.estado);
 		limpa_buffer();
@@ -259,8 +292,8 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 
 		Pai = NULL;
 		printf("Espaco disponivel : %d Mb",quant_blocos -info.I_bloco);
-		printf("\ninicio do bloco: %d\n",info.I_bloco);
-		printf("digite o fim do bloco: ");
+		printf("\ninicio do Bloco: %d\n",info.I_bloco);
+		printf("digite o fim do Bloco: ");
 		scanf("%d",&info.F_bloco);
 		printf("\n");
 
@@ -268,7 +301,7 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
         {
 			
 			printf("\nValor invalido\n");
-			printf("digite um valor valido para o fim do bloco(Espaco disponivel: %d Mb): ",quant_blocos -info.I_bloco);
+			printf("digite um valor valido para o fim do Bloco(Espaco disponivel: %d Mb): ",quant_blocos -info.I_bloco);
 			scanf("%d",&info.F_bloco);
 		}
 
@@ -283,3 +316,4 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 
 	}
 }
+
