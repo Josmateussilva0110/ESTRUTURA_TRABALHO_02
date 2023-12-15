@@ -136,36 +136,39 @@ void limpa_buffer(){
 
 void quebraNo(Memoria **No, Bloco info, Bloco *sobe, Memoria **No_maior, Memoria *filho)
 {
+	printf("\t\tentrou no quebra\n");
     if (info.I_bloco < (*No)->info_1.I_bloco)
     {
+		printf("\t\t\tif  quebra\n");
         *sobe = (*No)->info_1;
-        criaNo(No_maior, (*No)->info_2, (*No)->centro, (*No)->centro_dir, (*No)->dir, NULL, NULL);
+        criaNo(No_maior, (*No)->info_2, (*No)->centro_esq, (*No)->centro, (*No)->centro_dir, NULL, NULL);
         (*No)->info_1 = info;
         (*No)->centro = filho;
     }
     else if (info.I_bloco < (*No)->info_2.I_bloco)
     {
+		printf("\t\t\telse if 1  quebra\n");
         *sobe = info;
-        criaNo(No_maior, (*No)->info_2, filho, (*No)->dir, NULL, NULL, NULL);
+        criaNo(No_maior, (*No)->info_2, filho, (*No)->centro_dir, NULL, NULL, NULL);
     }
     else if (info.I_bloco < (*No)->info_3.I_bloco)
     {
+		printf("\t\t\telse if 2  quebra\n");
         *sobe = (*No)->info_2;
-        criaNo(No_maior, info, filho, (*No)->dir, NULL, NULL, NULL);
-    }
-    else if (info.I_bloco < (*No)->info_4.I_bloco)
-    {
-        *sobe = (*No)->info_3;
-        criaNo(No_maior, (*No)->info_4, filho, NULL, NULL, NULL, NULL);
+        criaNo(No_maior, info, filho, (*No)->centro_dir, NULL, NULL, NULL);
     }
     else
     {
-        *sobe = (*No)->info_4;
-        criaNo(No_maior, info, NULL, NULL, NULL, NULL, NULL);
+		printf("\t\t\telse  quebra\n");
+        *sobe = (*No)->info_3;
+        criaNo(No_maior, (*No)->info_4, filho, NULL, NULL, NULL, NULL);
     }
-
-    (*No)->centro_dir = (*No)->dir = NULL;
-    (*No)->n_info = 2;
+	(*No)->esq = NULL;
+	(*No)->centro_esq = NULL;
+	(*No)->centro = NULL;
+    (*No)->centro_dir = NULL;
+	(*No)->dir = NULL;
+    (*No)->n_info = 1;
 }
 
 
@@ -252,27 +255,21 @@ void imprime_bloco_info(Bloco b)
 
 void imprimir(Memoria *Raiz)
 {
-    if (Raiz != NULL)
+	if(Raiz != NULL)
     {
-
-        imprimir(Raiz->esq);
+		imprimir(Raiz->esq);
 		imprime_bloco_info(Raiz->info_1);
-        imprimir(Raiz->centro_esq);
+		imprimir(Raiz->centro_esq);
+		imprimir(Raiz->centro);
 		if(Raiz->n_info == 2)
 			imprime_bloco_info(Raiz->info_2);
-
-       // imprimir(Raiz->centro);
-
-        if (Raiz->n_info == 3)
+        if(Raiz->n_info == 3)
             imprime_bloco_info(Raiz->info_3);
-
-        imprimir(Raiz->centro_dir);
-
-        if (Raiz->n_info == 4)
+        if(Raiz->n_info == 4)
             imprime_bloco_info(Raiz->info_4);
-
-        imprimir(Raiz->dir);
-    }
+		imprimir(Raiz->centro_dir);
+		imprimir(Raiz->dir);
+	}
 }
 
 
@@ -330,3 +327,4 @@ void insere_bloco_NaMemoria(Memoria **Raiz, int quant_blocos)
 
 	}
 }
+
