@@ -54,6 +54,19 @@ int main()
 				else
 					printf("nenhum espaco encontrado\n");
 				break;
+			case 4:
+				printf("digite o tamanho do espaco que deseja liberar: ");
+				scanf("%d",&tam_espaco);
+				bloco *espaco = buscar_espaco_ocupado(arvore, tam_espaco);
+				if(espaco)
+				{
+					espaco->estado = 'l';
+					printf("bloco achado:\n");
+					imprime_bloco_info((*espaco));
+				}
+				else
+					printf("nenhum espaco encontrado\n");
+				break;
 			default:
 				break;
 		}
