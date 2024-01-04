@@ -421,3 +421,48 @@ bloco *buscar_espaco_livre(Memoria *raiz, int tam)
 
     return aux;
 }
+
+bloco *buscar_espaco_ocupado(Memoria *raiz, int tam) 
+{
+    bloco *aux = NULL;
+
+    if (raiz != NULL) 
+    {
+        aux = buscar_espaco_ocupado(raiz->esq, tam);
+
+        if (raiz->n_info >= 1 && raiz->info_1.estado == 'o' &&
+        (raiz->info_1.F_bloco - raiz->info_1.I_bloco + 1) >= tam) 
+            aux = &(raiz->info_1);
+
+        if (aux == NULL) 
+        {
+            aux = buscar_espaco_ocupado(raiz->cen_esq, tam);
+            if (raiz->info_2.estado == 'o' &&
+            (raiz->info_2.F_bloco - raiz->info_2.I_bloco + 1) >= tam) {
+                aux = &(raiz->info_2);
+            }
+        }
+
+        if (aux == NULL) 
+        {
+            aux = buscar_espaco_ocupado(raiz->centro, tam);
+            if (raiz->info_3.estado == 'o' &&
+            (raiz->info_3.F_bloco - raiz->info_3.I_bloco + 1) >= tam)
+                aux = &(raiz->info_3);
+        }
+
+        if (aux == NULL && raiz->n_info == 4) 
+        {
+            aux = buscar_espaco_ocupado(raiz->cen_dir, tam);
+            if (raiz->info_4.estado == 'o' &&
+            (raiz->info_4.F_bloco - raiz->info_4.I_bloco + 1) >= tam)
+                aux = &(raiz->info_4);
+        }
+
+        if (aux == NULL)
+            aux = buscar_espaco_ocupado(raiz->dir, tam);
+    }
+
+    return aux;
+}
+
