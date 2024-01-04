@@ -15,8 +15,7 @@ typedef struct Artista
 } Artista;
 
 
-Artista* rotacao_esquerda(Artista* A)
-{
+Artista* rotacao_esquerda(Artista* A){
     Artista* B = A->dir;
     A->dir = B->esq;
     B->esq = A;
@@ -45,16 +44,11 @@ void trocar_cor(Artista* H){
         H->dir->cor = !H->dir->cor;
 }
 
-
-int cor_artista(Artista* H) {
-    int cor_resultado = 0;  // Variável local para armazenar o resultado
-
-    if (H == NULL)
-        cor_resultado = 0;
+int cor_artista(Artista* H){
+    if(H == NULL)
+        return 0;
     else
-        cor_resultado = H->cor;
-
-    return cor_resultado;  
+        return H->cor;
 }
 
 Artista* move2EsqRED_artista(Artista* H){
@@ -108,46 +102,43 @@ Artista *criar_artista(char *nome_artista, char *estilo_musical, int numero_albu
 }
 
 Artista* insereNO(Artista* H, char *nome_artista, char *estilo_musical, int numero_albuns, int *resp) {
-    Artista *resultado = H;  // Variável local para armazenar o resultado
-
     if (H == NULL) {
         // Cria um novo nó de artista usando a função criar_artista
         Artista *novo = criar_artista(nome_artista, estilo_musical, numero_albuns);
         
         if (novo == NULL) {
             *resp = 0;
-            resultado = NULL;
-        } else {
-            *resp = 1;
-            resultado = novo;
-        }
-    } else {
-        int comparacao = strcmp(nome_artista, H->nome);
-
-        if (comparacao == 0)
-            *resp = 0; // Valor duplicado
-        else {
-            if (comparacao < 0)
-                H->esq = insereNO(H->esq, nome_artista, estilo_musical, numero_albuns, resp);
-            else
-                H->dir = insereNO(H->dir, nome_artista, estilo_musical, numero_albuns, resp);
+            return NULL;
         }
 
-        // Ajustes para manter a propriedade da árvore vermelha-preta
-        // Aqui é o balanceamento
-        if (cor_artista(H->dir) == 1 && cor_artista(H->esq) == 0)
-            H = rotacao_esquerda(H);
-
-        if (cor_artista(H->esq) == 1 && cor_artista(H->esq->esq) == 1)
-            H = rotacao_direita(H);
-
-        if (cor_artista(H->esq) == 1 && cor_artista(H->dir) == 1)
-            trocar_cor(H);
+        *resp = 1;
+        return novo;
     }
 
-    return resultado;
-}
+    int comparacao = strcmp(nome_artista, H->nome);
 
+    if (comparacao == 0)
+        *resp = 0; // Valor duplicado
+    else {
+        if (comparacao < 0)
+            H->esq = insereNO(H->esq, nome_artista, estilo_musical, numero_albuns, resp);
+        else
+            H->dir = insereNO(H->dir, nome_artista, estilo_musical, numero_albuns, resp);
+    }
+
+    // Ajustes para manter a propriedade da árvore vermelha-preta
+    //Aqui é o balancear
+    if (cor_artista(H->dir) == 1 && cor_artista(H->esq) == 0)
+        H = rotacao_esquerda(H);
+
+    if (cor_artista(H->esq) == 1 && cor_artista(H->esq->esq) == 1)
+        H = rotacao_direita(H);
+
+    if (cor_artista(H->esq) == 1 && cor_artista(H->dir) == 1)
+        trocar_cor(H);
+
+    return H;
+}
 
 int insere_Artista(Artista **raiz, char *nome_artista, char *estilo_musical, int numero_albuns) {
     int resp;
@@ -179,6 +170,7 @@ void exibir_arvore(Artista *raiz) {
 
 // Função para encontrar um artista na árvore com base no nome
 Artista *achar_artista(Artista *raiz, const char *nome_artista) {
+    printf("entrou aqui achar_artista\n");
     Artista *encontrado;
     encontrado = NULL;
 
@@ -203,6 +195,7 @@ void cadastrar_albuns(Artista *raiz_artistas, const char *nome_artista, char *ti
     if (artista != NULL) {
         // Inserir álbum na árvore de álbuns do artista
         insere_Album(&(artista->albuns), titulo, ano_lancamento, num_musicas);
+        printf("Album cadastrado para o artista '%s'.\n", nome_artista);
     } else {
         printf("Artista '%s' nao encontrado.\n", nome_artista);
     }
@@ -212,6 +205,7 @@ void cadastrar_albuns(Artista *raiz_artistas, const char *nome_artista, char *ti
 
 // Função para buscar um artista na árvore com base no nome e exibir suas informações
 void buscar_artista_e_exibir(Artista *raiz, const char *nome_artista) {
+    printf("Buscando artista...\n");
     Artista *encontrado = achar_artista(raiz, nome_artista);
 
     if (encontrado != NULL) {
@@ -277,44 +271,36 @@ Artista *achar_artista_pelo_album(Artista *raiz_artistas, const char *nome_album
 }
 
 Album *achar_album_pela_musica(Album *raiz, const char *nome_musica) {
-    Album *album_encontrado;
-    album_encontrado = NULL;
-
-    if (raiz != NULL) {
-        Musica *musica_atual = raiz->musicas;
-
-        while (musica_atual != NULL) {
-            if (strcmp(musica_atual->titulo, nome_musica) == 0) {
-                // A música foi encontrada neste álbum
-                album_encontrado = raiz;
-                break;
-            }
-
-            musica_atual = musica_atual->prox;
-        }
-
-        // Buscar na subárvore esquerda
-        if (album_encontrado == NULL) {
-            Album *album_na_esquerda;
-            album_na_esquerda = achar_album_pela_musica(raiz->esq, nome_musica);
-            if (album_na_esquerda != NULL) {
-                album_encontrado = album_na_esquerda;
-            }
-        }
-
-        // Buscar na subárvore direita
-        if (album_encontrado == NULL) {
-            Album *album_na_direita;
-            album_na_direita = achar_album_pela_musica(raiz->dir, nome_musica);
-            if (album_na_direita != NULL) {
-                album_encontrado = album_na_direita;
-            }
-        }
+     if (raiz == NULL) {
+        return NULL;
     }
 
-    return album_encontrado;
-}
+    Musica *musica_atual = raiz->musicas;
 
+    while (musica_atual != NULL) {
+        if (strcmp(musica_atual->titulo, nome_musica) == 0) {
+            // A música foi encontrada neste álbum
+            return raiz;
+        }
+
+        musica_atual = musica_atual->prox;
+    }
+
+    // Buscar na subárvore esquerda
+    Album *album_na_esquerda = achar_album_pela_musica(raiz->esq, nome_musica);
+    if (album_na_esquerda != NULL) {
+        return album_na_esquerda;
+    }
+
+    // Buscar na subárvore direita
+    Album *album_na_direita = achar_album_pela_musica(raiz->dir, nome_musica);
+    if (album_na_direita != NULL) {
+        return album_na_direita;
+    }
+
+    // A música não foi encontrada neste álbum nem em seus descendentes
+    return NULL;
+}
 
 // Função para exibir informações sobre um álbum contendo uma música específica
 void exibir_album_com_musica_recursivo(Album *raiz, const char *nome_musica) {
@@ -360,6 +346,7 @@ void encontrar_artistas_e_albuns_pela_musica_recursivo(Artista **raiz_artistas, 
 void encontrar_artistas_e_albuns_pela_musica(Artista *raiz_artistas, const char *nome_musica) {
     if (raiz_artistas == NULL) {
         printf("Nenhum artista na árvore.\n");
+        return;
     }
 
     // Percorrer a árvore de artistas para encontrar os artistas e álbuns
@@ -412,27 +399,23 @@ Artista *remover_album_por_nome_artista_titulo(Artista *raiz_artistas, const cha
 //////////////////////////////Remover Artista///////////////////////////
 
 int consulta_ArvLLRB(Artista *raiz, const char *nome) {
-    int encontrado = 0; // Variável local para armazenar o resultado
-
-    if (raiz != NULL) {
-        int comparacao = strcmp(nome, raiz->nome);
-
-        if (comparacao == 0) {
-            encontrado = 1; // Artista encontrado
-        } else if (comparacao < 0) {
-            encontrado = consulta_ArvLLRB(raiz->esq, nome);
-        } else {
-            encontrado = consulta_ArvLLRB(raiz->dir, nome);
-        }
+    if (raiz == NULL) {
+        return 0;
     }
 
-    return encontrado;
+    int comparacao = strcmp(nome, raiz->nome);
+
+    if (comparacao == 0) {
+        return 1; // Artista encontrado
+    } else if (comparacao < 0) {
+        return consulta_ArvLLRB(raiz->esq, nome);
+    } else {
+        return consulta_ArvLLRB(raiz->dir, nome);
+    }
 }
 
 
-
-Artista* procuraMenorArtista(Artista* atual)
-{
+Artista* procuraMenorArtista(Artista* atual) {
     Artista* no1 = atual;
     Artista* no2 = atual->esq;
     while (no2 != NULL) {
@@ -442,32 +425,29 @@ Artista* procuraMenorArtista(Artista* atual)
     return no1;
 }
 
-Artista* removerMenorArtista(Artista* H)
-{
-    Artista* resultado;
-    resultado = H;  // Cria uma variável local para armazenar o resultado
-
-    if (H != NULL) {
-        if (H->esq == NULL) {
-            // Se não houver filho à esquerda, libere a memória e atualize a variável local
-            free(H);
-            resultado = NULL;
-        } else {
-            // Se o filho à esquerda e o neto à esquerda são pretos, faz a rotação à esquerda
-            if (cor_artista(H->esq) == 0 && H->esq->esq != NULL && cor_artista(H->esq->esq) == 0) {
-                H = move2DirRED_artista(H);
-            }
-
-            H->esq = removerMenorArtista(H->esq);
-            resultado = balancear(H);  // Atualiza a variável com o resultado final
-        }
+Artista* removerMenorArtista(Artista* H) {
+    if (H == NULL) {
+        return NULL;
     }
 
-    return resultado;
+    if (H->esq == NULL) {
+        // Se não houver filho à esquerda, armazene a referência à raiz para liberar a memória e retorne NULL
+        Artista* temp = H;
+        H = NULL;
+        free(temp);
+        return NULL;
+    }
+
+    // Se o filho à esquerda e o neto à esquerda são pretos, faz a rotação à esquerda
+    if (cor_artista(H->esq) == 0 && H->esq->esq != NULL && cor_artista(H->esq->esq) == 0) {
+        H = move2DirRED_artista(H);
+    }
+
+    H->esq = removerMenorArtista(H->esq);
+    return balancear(H);
 }
 
-Artista* removeArtista(Artista** raiz, const char* nome)
-{
+Artista* removeArtista(Artista** raiz, const char* nome) {
     Artista* H = *raiz;
 
     if (H == NULL) {
@@ -521,9 +501,7 @@ Artista* removeArtista(Artista** raiz, const char* nome)
     return H;
 }
 
-int remove_ArvLLRB(Artista** raiz, const char* nome)
-{
-    int remove = 0;
+int remove_ArvLLRB(Artista** raiz, const char* nome) {
     if (consulta_ArvLLRB(*raiz, nome)) {
         removeArtista(raiz, nome);
 
@@ -531,10 +509,9 @@ int remove_ArvLLRB(Artista** raiz, const char* nome)
             (*raiz)->cor = 0; // Define a cor da raiz como preta após a remoção
         }
 
-        remove = 1; // Artista removido com sucesso
+        return 1; // Artista removido com sucesso
     } else {
-        remove = 0; // Artista não encontrado na árvore
+        return 0; // Artista não encontrado na árvore
     }
-    return remove;
 }
 

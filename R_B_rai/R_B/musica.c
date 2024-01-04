@@ -20,31 +20,29 @@ Musica *criarMusica(char *titulo, int duracao_minutos) {
     return nova_musica;
 }
 
-Musica* inserirMusica(Musica* raiz, char* titulo, int duracao_minutos) {
-    Musica* resultado = raiz;  // Variável local para armazenar o resultado
-
+Musica *inserirMusica(Musica *raiz, char *titulo, int duracao_minutos) 
+{
     // Criar uma nova música
-    Musica* novaMusica = criarMusica(titulo, duracao_minutos);
+    Musica *novaMusica = criarMusica(titulo, duracao_minutos);
 
     // Caso a lista esteja vazia ou a nova música deva ser inserida no início
     if (raiz == NULL || strcmp(novaMusica->titulo, raiz->titulo) < 0) {
         novaMusica->prox = raiz;
-        resultado = novaMusica;
-    } else {
-        // Procura a posição correta para inserir a música mantendo a lista ordenada
-        Musica* atual = raiz;
-        while (atual->prox != NULL && strcmp(novaMusica->titulo, atual->prox->titulo) > 0) {
-            atual = atual->prox;
-        }
-
-        // Insere a nova música na posição correta
-        novaMusica->prox = atual->prox;
-        atual->prox = novaMusica;
+        return novaMusica;
     }
 
-    return resultado;
-}
+    // Procura a posição correta para inserir a música mantendo a lista ordenada
+    Musica *atual = raiz;
+    while (atual->prox != NULL && strcmp(novaMusica->titulo, atual->prox->titulo) > 0) {
+        atual = atual->prox;
+    }
 
+    // Insere a nova música na posição correta
+    novaMusica->prox = atual->prox;
+    atual->prox = novaMusica;
+
+    return raiz;
+}
 
 
 // Função para exibir todas as músicas de um álbum
@@ -59,37 +57,33 @@ void exibir_musicas(Musica *raiz) {
     }
 }
 
-Musica* achar_musica(Musica* raiz, const char* titulo) {
-    Musica* resultado = NULL;  // Variável local para armazenar o resultado
-
+// Função para buscar uma música por título
+Musica *achar_musica(Musica *raiz, const char *titulo) {
     while (raiz != NULL) {
         // Comparar o título da música atual com o título desejado
         if (strcmp(raiz->titulo, titulo) == 0) {
             // A música foi encontrada
-            resultado = raiz;
-            break;
+            return raiz;
         }
 
         // Avançar para a próxima música na lista
         raiz = raiz->prox;
     }
 
-    // resultado será NULL se a música não foi encontrada
-    return resultado;
+    // A música não foi encontrada
+    return NULL;
 }
 
-
 // Função para remover uma música específica do álbum
-Musica* remover_musica(Musica* raiz, const char* nome_musica) {
-    Musica* resultado = raiz;  // Variável local para armazenar o resultado
-    Musica* atual = raiz;
-    Musica* anterior = NULL;
+Musica *remover_musica(Musica *raiz, const char *nome_musica) {
+    Musica *atual = raiz;
+    Musica *anterior = NULL;
 
     while (atual != NULL) {
         if (strcmp(atual->titulo, nome_musica) == 0) {
             if (anterior == NULL) {
                 // A música a ser removida é a primeira na lista
-                resultado = atual->prox;
+                raiz = atual->prox;
             } else {
                 // A música a ser removida não é a primeira na lista
                 anterior->prox = atual->prox;
@@ -97,7 +91,7 @@ Musica* remover_musica(Musica* raiz, const char* nome_musica) {
 
             // Liberar memória alocada para a música removida
             free(atual);
-            break;
+            return raiz;
         }
 
         // Avançar para o próximo nó
@@ -105,6 +99,6 @@ Musica* remover_musica(Musica* raiz, const char* nome_musica) {
         atual = atual->prox;
     }
 
-    // resultado será igual a raiz se a música não foi encontrada
-    return resultado;
+    // A música não foi encontrada
+    return raiz;
 }
