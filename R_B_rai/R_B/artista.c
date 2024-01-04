@@ -45,6 +45,7 @@ void trocar_cor(Artista* H){
         H->dir->cor = !H->dir->cor;
 }
 
+
 int cor_artista(Artista* H) {
     int cor_resultado = 0;  // Variável local para armazenar o resultado
 
